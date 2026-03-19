@@ -1,0 +1,217 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8f9fa;
+  --foreground: #171717;
+  --color-primary: #F97316;
+  --color-primary-hover: #ea6c0a;
+  --color-sidebar-bg: #1e1e2e;
+  --color-sidebar-text: #a0a0b8;
+  --color-sidebar-active: #F97316;
+  --color-card-bg: #ffffff;
+  --color-border: #e5e7eb;
+  --color-text-secondary: #6b7280;
+  --color-easy: #22c55e;
+  --color-moderate: #f59e0b;
+  --color-hard: #ef4444;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* Question paper print styles */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm 18mm;
+  }
+
+  /* Hide UI chrome: toolbars, nav, sidebars, action bars */
+  .no-print,
+  header, nav, aside,
+  .desktop-only, .mobile-only {
+    display: none !important;
+  }
+
+  /* Make all wrappers between body and the paper transparent */
+  body, body * {
+    background: transparent !important;
+  }
+
+  /* Strip the gray wrapper on the print page */
+  #print-paper-wrapper {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+  }
+
+  /* The paper itself */
+  #question-paper-root {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 8mm 10mm !important;
+    background: white !important;
+    color: #111827 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ── Page breaks ── */
+
+  /* Each section (after the first) starts on a new page */
+  .section-block + .section-block {
+    break-before: page;
+    page-break-before: always;
+    padding-top: 8mm;
+  }
+
+  /* Answer key starts on its own page */
+  .answer-key-section {
+    break-before: page;
+    page-break-before: always;
+    padding-top: 8mm;
+  }
+
+  /* A question never splits across pages */
+  .question-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Section header never orphaned at bottom of page */
+  .section-block > div:first-child {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* ── Layout preservation ── */
+  div[style*="display: flex"] { display: flex !important; }
+  div[style*="display: grid"] { display: grid !important; }
+
+  /* Underlines for student fill-in fields */
+  span[style*="border-bottom"] {
+    display: inline-block !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  /* Hide the on-screen page break divider */
+  .page-break-divider {
+    display: none !important;
+  }
+}
+
+/* Animations */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-spin { animation: spin 1s linear infinite; }
+.animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+
+/* Shimmer skeleton */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer-card {
+  background: linear-gradient(
+    90deg,
+    rgba(229,231,235,0.4) 0%,
+    rgba(243,244,246,1) 50%,
+    rgba(229,231,235,0.4) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.1s ease-in-out infinite;
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Responsive layout helpers */
+.desktop-only { display: flex; }
+.mobile-only  { display: none; }
+
+/* Assignment grid — 2 cols desktop, 1 col mobile */
+.assignment-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+
+@media (max-width: 768px) {
+  .desktop-only { display: none !important; }
+  .mobile-only  { display: flex !important; }
+
+  .assignment-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+}
+
+/* Mobile drawer overlay */
+.mobile-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 50;
+  backdrop-filter: blur(2px);
+}
+
+/* Mobile slide-in drawer */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: white;
+  z-index: 51;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+  overflow-y: auto;
+}
+.mobile-drawer.open {
+  transform: translateX(0);
+}
