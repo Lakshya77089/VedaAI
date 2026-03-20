@@ -16,7 +16,7 @@ The backend stores assignment definitions in MongoDB and triggers AI generation 
 - Backend: Node.js + Express + MongoDB (Mongoose)
 - Real-time updates: Socket.IO
 - Async AI jobs (optional): BullMQ + Redis
-- LLM provider: OpenRouter (`openai` client pointing to OpenRouter base URL)
+- LLM provider: OpenRouter (`openai` client pointing to OpenRouter base URL) using model id `AI_MODEL` (currently `meta-llama/llama-3.1-8b-instruct`)
 
 ---
 
@@ -164,7 +164,7 @@ Copy `backend/.env.example` to `backend/.env` and set:
 - `MONGO_URI` (MongoDB connection string)
 - `REDIS_URL` (only needed if `USE_REDIS=true`)
 - `OPENROUTER_API_KEY` (OpenRouter key)
-- `AI_MODEL` (OpenRouter model; default in code is overridden by your env)
+- `AI_MODEL` (OpenRouter model id used by the backend; currently set in `backend/.env` to `meta-llama/llama-3.1-8b-instruct`)
 - `FRONTEND_URL` (kept for CORS compatibility, but the backend now uses `origin: true`)
 - `USE_REDIS` (set to `true` to enable BullMQ worker mode)
 
@@ -174,7 +174,7 @@ Example (fill values):
 - `USE_REDIS=true`
 - `REDIS_URL=rediss://...`
 - `OPENROUTER_API_KEY=...`
-- `AI_MODEL=...`
+- `AI_MODEL=meta-llama/llama-3.1-8b-instruct`
 
 ### Frontend environment (`frontend/.env.local`)
 Set:
@@ -593,7 +593,4 @@ Base path: `/api`
   - `generation:complete` emitted by `workers/aiWorker.processAssignment`
   - `generation:error` emitted by `workers/aiWorker.processAssignment`
   - `notification:new` emitted by `workers/aiWorker.processAssignment`
-
-### 4) Known Gaps (based on current code)
-- The UI has a file picker for images/PDF, but the selected file is not included in the `POST /api/assignments` payload, and the backend currently does not parse or OCR/parse the file.
 
