@@ -6,6 +6,7 @@ import EmptyState from './EmptyState'
 interface AssignmentGridProps {
   assignments: AssignmentListItem[]
   onDelete: (id: string) => void
+  onDuplicate?: (id: string) => void
   hasMore: boolean
   isFetchingMore: boolean
   onLoadMore: () => void
@@ -14,6 +15,7 @@ interface AssignmentGridProps {
 export default function AssignmentGrid({
   assignments,
   onDelete,
+  onDuplicate,
   hasMore,
   isFetchingMore,
   onLoadMore,
@@ -49,6 +51,7 @@ export default function AssignmentGrid({
             key={assignment._id}
             assignment={assignment}
             onDelete={onDelete}
+            onDuplicate={onDuplicate}
           />
         ))}
       </div>

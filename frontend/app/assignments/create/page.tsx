@@ -17,9 +17,9 @@ export default function CreateAssignmentPage() {
                 flexShrink: 0,
               }}
             />
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827' }}>Create Assignment</h1>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--foreground)' }}>Create Assignment</h1>
           </div>
-          <p style={{ fontSize: 13, color: '#6b7280', paddingLeft: 20 }}>
+          <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', paddingLeft: 20 }}>
             Set up a new assignment for your students
           </p>
         </div>

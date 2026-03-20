@@ -6,9 +6,10 @@ import { MoreVertical } from 'lucide-react'
 interface ThreeDotMenuProps {
   onView: () => void
   onDelete: () => void
+  onDuplicate?: () => void
 }
 
-export default function ThreeDotMenu({ onView, onDelete }: ThreeDotMenuProps) {
+export default function ThreeDotMenu({ onView, onDelete, onDuplicate }: ThreeDotMenuProps) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -47,12 +48,12 @@ export default function ThreeDotMenu({ onView, onDelete }: ThreeDotMenuProps) {
             right: 0,
             top: '100%',
             marginTop: 4,
-            backgroundColor: 'white',
+            backgroundColor: 'var(--color-card-bg)',
             border: '1px solid var(--color-border)',
             borderRadius: 10,
             boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
             zIndex: 50,
-            minWidth: 140,
+            minWidth: 160,
             overflow: 'hidden',
           }}
         >
@@ -66,14 +67,35 @@ export default function ThreeDotMenu({ onView, onDelete }: ThreeDotMenuProps) {
               cursor: 'pointer',
               fontSize: 13,
               fontWeight: 500,
-              color: '#374151',
+              color: 'var(--foreground)',
               textAlign: 'left',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f9fafb')}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-hover-bg)')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
           >
             View Assignment
           </button>
+          {onDuplicate && (
+            <button
+              onClick={() => { setOpen(false); onDuplicate() }}
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                background: 'none',
+                border: 'none',
+                borderTop: '1px solid var(--color-border)',
+                cursor: 'pointer',
+                fontSize: 13,
+                fontWeight: 500,
+                color: 'var(--foreground)',
+                textAlign: 'left',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-hover-bg)')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              Duplicate
+            </button>
+          )}
           <button
             onClick={() => { setOpen(false); onDelete() }}
             style={{
@@ -81,7 +103,7 @@ export default function ThreeDotMenu({ onView, onDelete }: ThreeDotMenuProps) {
               padding: '12px 14px',
               background: 'none',
               border: 'none',
-              borderTop: '1px solid #f3f4f6',
+              borderTop: '1px solid var(--color-border)',
               cursor: 'pointer',
               fontSize: 13,
               fontWeight: 500,

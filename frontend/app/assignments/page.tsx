@@ -10,8 +10,18 @@ import AssignmentsShimmer from '@/components/assignments/AssignmentsShimmer'
 import { useAssignmentStore } from '@/store/useAssignmentStore'
 import { useAssignments } from '@/hooks/useAssignments'
 import { useSocket } from '@/hooks/useSocket'
+import api from '@/lib/api'
+import { useToast } from '@/context/ToastContext'
 
 const PAGE_LIMIT = 10
+
+const STATUS_FILTERS = [
+  { value: 'all', label: 'All' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'processing', label: 'Processing' },
+  { value: 'complete', label: 'Complete' },
+  { value: 'error', label: 'Error' },
+] as const
 
 export default function AssignmentsPage() {
   const {
@@ -21,6 +31,7 @@ export default function AssignmentsPage() {
   const { fetchAssignments, fetchMoreAssignments, deleteAssignment } = useAssignments()
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery)
+  const [statusFilter, setStatusFilter] = useState('all')
 
   useSocket()
 
@@ -30,23 +41,34 @@ export default function AssignmentsPage() {
     return () => clearTimeout(t)
   }, [searchQuery])
 
-  // Initial load + re-fetch on debounced search change
+  // Initial load + re-fetch on debounced search change or status filter change
   useEffect(() => {
-    fetchAssignments(1, PAGE_LIMIT, debouncedSearchQuery)
-  }, [fetchAssignments, debouncedSearchQuery])
+    fetchAssignments(1, PAGE_LIMIT, debouncedSearchQuery, statusFilter)
+  }, [fetchAssignments, debouncedSearchQuery, statusFilter])
 
   const hasMore = pagination ? pagination.page < pagination.totalPages : false
 
   const handleLoadMore = useCallback(() => {
     if (!pagination || isFetchingMore) return
-    fetchMoreAssignments(pagination.page + 1, PAGE_LIMIT, debouncedSearchQuery)
-  }, [pagination, isFetchingMore, debouncedSearchQuery, fetchMoreAssignments])
+    fetchMoreAssignments(pagination.page + 1, PAGE_LIMIT, debouncedSearchQuery, statusFilter)
+  }, [pagination, isFetchingMore, debouncedSearchQuery, statusFilter, fetchMoreAssignments])
 
   const handleDelete = async (id: string) => {
     try {
       await deleteAssignment(id)
     } catch {
       setDeleteError('Failed to delete assignment. Please try again.')
+      setTimeout(() => setDeleteError(null), 3000)
+    }
+  }
+
+  const handleDuplicate = async (id: string) => {
+    try {
+      await api.post(`/assignments/${id}/duplicate`)
+      // Refresh the list to show the new clone
+      fetchAssignments(1, PAGE_LIMIT, debouncedSearchQuery, statusFilter)
+    } catch {
+      setDeleteError('Failed to duplicate assignment. Please try again.')
       setTimeout(() => setDeleteError(null), 3000)
     }
   }
@@ -67,19 +89,45 @@ export default function AssignmentsPage() {
                 flexShrink: 0,
               }}
             />
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827' }}>Assignments</h1>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--foreground)' }}>Assignments</h1>
           </div>
-          <p style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.5 }}>
+          <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
             Manage and create assignments for your classes.
           </p>
         </div>
 
-        {/* Search + filter */}
-        <div style={{ marginBottom: 20 }}>
+        {/* Search + filter row */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
           />
+
+          {/* Status filter pills */}
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {STATUS_FILTERS.map((f) => {
+              const active = statusFilter === f.value
+              return (
+                <button
+                  key={f.value}
+                  onClick={() => setStatusFilter(f.value)}
+                  style={{
+                    padding: '6px 16px',
+                    borderRadius: 50,
+                    border: `1px solid ${active ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                    backgroundColor: active ? 'var(--color-primary)' : 'var(--color-card-bg)',
+                    color: active ? 'white' : 'var(--color-text-secondary)',
+                    fontSize: 13,
+                    fontWeight: active ? 600 : 400,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {f.label}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Error */}
@@ -106,6 +154,7 @@ export default function AssignmentsPage() {
           <AssignmentGrid
             assignments={assignments}
             onDelete={handleDelete}
+            onDuplicate={handleDuplicate}
             hasMore={hasMore}
             isFetchingMore={isFetchingMore}
             onLoadMore={handleLoadMore}

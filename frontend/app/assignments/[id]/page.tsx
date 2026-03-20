@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { AlertCircle, Download, RefreshCw } from 'lucide-react'
+import { AlertCircle, Download, RefreshCw, FileText, Copy } from 'lucide-react'
 import AppShell from '@/components/layout/AppShell'
 import QuestionPaper from '@/components/output/QuestionPaper'
 import ActionBar from '@/components/output/ActionBar'
@@ -12,6 +12,7 @@ import { useSocket } from '@/hooks/useSocket'
 import { AssignmentDetail } from '@/types/assignment'
 import api from '@/lib/api'
 import { downloadAsPDF } from '@/lib/pdf'
+import { downloadAsDocx } from '@/lib/docx'
 import { useToast } from '@/context/ToastContext'
 
 export default function AssignmentOutputPage() {
@@ -23,7 +24,9 @@ export default function AssignmentOutputPage() {
   const [error, setError] = useState<string | null>(null)
   const [regenerating, setRegenerating] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [downloadingDocx, setDownloadingDocx] = useState(false)
   const [printing, setPrinting] = useState(false)
+  const [duplicating, setDuplicating] = useState(false)
 
   useSocket(id)
 
@@ -85,6 +88,28 @@ export default function AssignmentOutputPage() {
     )
     setPrinting(false)
     if (!result.success) showToast(result.error ?? 'Could not generate PDF.', 'error')
+  }
+
+  const handleDownloadDocx = async () => {
+    if (!currentAssignment) return
+    setDownloadingDocx(true)
+    const result = await downloadAsDocx(currentAssignment)
+    setDownloadingDocx(false)
+    if (!result.success) showToast(result.error ?? 'Could not generate Word file.', 'error')
+  }
+
+  const handleDuplicate = async () => {
+    if (!currentAssignment || duplicating) return
+    setDuplicating(true)
+    try {
+      const { data } = await api.post(`/assignments/${id}/duplicate`)
+      showToast('Assignment duplicated! Redirecting...', 'success')
+      router.push(`/assignments/${data.data._id}`)
+    } catch {
+      showToast('Failed to duplicate assignment.', 'error')
+    } finally {
+      setDuplicating(false)
+    }
   }
 
   if (loading) {
@@ -212,28 +237,53 @@ export default function AssignmentOutputPage() {
             </p>
           </div>
 
-          <button
-            onClick={handleDownload}
-            disabled={downloading}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '10px 20px',
-              backgroundColor: 'white',
-              color: '#111827',
-              border: 'none',
-              borderRadius: 50,
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: downloading ? 'not-allowed' : 'pointer',
-              flexShrink: 0,
-              opacity: downloading ? 0.7 : 1,
-            }}
-          >
-            <Download size={14} />
-            {downloading ? 'Preparing...' : 'Download as PDF'}
-          </button>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', flexShrink: 0 }}>
+            <button
+              onClick={handleDownload}
+              disabled={downloading}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '10px 20px',
+                backgroundColor: 'white',
+                color: '#111827',
+                border: 'none',
+                borderRadius: 50,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: downloading ? 'not-allowed' : 'pointer',
+                flexShrink: 0,
+                opacity: downloading ? 0.7 : 1,
+              }}
+            >
+              <Download size={14} />
+              {downloading ? 'Preparing...' : 'PDF'}
+            </button>
+
+            <button
+              onClick={handleDownloadDocx}
+              disabled={downloadingDocx}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '10px 20px',
+                backgroundColor: '#2563eb',
+                color: 'white',
+                border: 'none',
+                borderRadius: 50,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: downloadingDocx ? 'not-allowed' : 'pointer',
+                flexShrink: 0,
+                opacity: downloadingDocx ? 0.7 : 1,
+              }}
+            >
+              <FileText size={14} />
+              {downloadingDocx ? 'Preparing...' : 'Word'}
+            </button>
+          </div>
         </div>
 
         {/* Question paper */}
@@ -247,6 +297,10 @@ export default function AssignmentOutputPage() {
         isRegenerating={regenerating}
         onPrintQuestions={handlePrintQuestions}
         isPrinting={printing}
+        onDuplicate={handleDuplicate}
+        isDuplicating={duplicating}
+        onDownloadWord={handleDownloadDocx}
+        isDownloadingWord={downloadingDocx}
       />
     </AppShell>
   )

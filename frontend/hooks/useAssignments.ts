@@ -14,12 +14,12 @@ export function useAssignments() {
   } = useAssignmentStore()
 
   const fetchAssignments = useCallback(
-    async (page = 1, limit = 10, search = '') => {
+    async (page = 1, limit = 10, search = '', status = 'all') => {
       const fetchId = ++latestFetchIdRef.current
       setLoading(true)
       setError(null)
       try {
-        const { data } = await api.get('/assignments', { params: { page, limit, search } })
+        const { data } = await api.get('/assignments', { params: { page, limit, search, status } })
         if (fetchId !== latestFetchIdRef.current) return
         setAssignments(data.data.assignments)
         setPagination(data.data.pagination)
@@ -34,11 +34,11 @@ export function useAssignments() {
   )
 
   const fetchMoreAssignments = useCallback(
-    async (page: number, limit = 10, search = '') => {
+    async (page: number, limit = 10, search = '', status = 'all') => {
       const fetchId = ++latestMoreFetchIdRef.current
       setFetchingMore(true)
       try {
-        const { data } = await api.get('/assignments', { params: { page, limit, search } })
+        const { data } = await api.get('/assignments', { params: { page, limit, search, status } })
         if (fetchId !== latestMoreFetchIdRef.current) return
         appendAssignments(data.data.assignments)
         setPagination(data.data.pagination)

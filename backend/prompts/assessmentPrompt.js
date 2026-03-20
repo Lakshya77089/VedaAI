@@ -1,5 +1,5 @@
 function buildAssessmentPrompt(assignment) {
-  const { questionConfig, additionalInstructions, subject, className } = assignment
+  const { questionConfig, additionalInstructions, additionalInfo, subject, className } = assignment
 
   const activeTypes = questionConfig.filter((cfg) => cfg.count > 0)
 
@@ -17,9 +17,8 @@ function buildAssessmentPrompt(assignment) {
 
 SUBJECT: ${subject}
 CLASS / GRADE: ${className}
-ADDITIONAL INSTRUCTIONS FROM TEACHER: ${additionalInstructions || 'None'}
 
-Create a complete question paper with the following question distribution:
+${additionalInfo ? `ADDITIONAL CONTEXT (use this background information about the paper/topic to generate relevant, well-targeted questions):\n${additionalInfo}\n` : ''}${additionalInstructions ? `TEACHER NOTES (use these to guide question style/topic focus, but do NOT include them on the paper):\n${additionalInstructions}\n` : ''}Create a complete question paper with the following question distribution:
 ${questionBreakdown}
 
 TOTAL QUESTIONS: ${totalQuestions}

@@ -11,6 +11,7 @@ const assignmentSchema = new mongoose.Schema({
   className: { type: String, required: true, trim: true, set: capitalize },
   dueDate: { type: Date, required: true },
   additionalInstructions: { type: String, default: '' },
+  additionalInfo: { type: String, default: '' },
   questionConfig: [questionConfigItemSchema],
   status: {
     type: String,
@@ -22,6 +23,7 @@ const assignmentSchema = new mongoose.Schema({
     totalMarks: Number,
     totalQuestions: Number,
     timeAllowed: Number,
+    generalInstructions: { type: String, default: '' },
   },
   errorMessage: { type: String },
 }, { timestamps: true })

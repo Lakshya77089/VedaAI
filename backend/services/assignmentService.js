@@ -10,6 +10,7 @@ const createAssignmentSchema = z.object({
   dueDate: z.string().min(1, 'dueDate is required').refine((d) => !isNaN(Date.parse(d)), { message: 'dueDate must be a valid date' }),
   schoolName: z.string().max(200).optional(),
   additionalInstructions: z.string().max(1000).optional(),
+  additionalInfo: z.string().max(2000).optional(),
 })
 
 const CACHE_TTL = 3600
@@ -103,7 +104,7 @@ async function handleCreateAssignment(data, io) {
     throw err
   }
 
-  const { name, schoolName, subject, className, dueDate, additionalInstructions } = validation.data
+  const { name, schoolName, subject, className, dueDate, additionalInstructions, additionalInfo } = validation.data
   const { questionConfig } = data
 
   let parsedConfig
@@ -128,6 +129,7 @@ async function handleCreateAssignment(data, io) {
     className,
     dueDate: new Date(dueDate),
     additionalInstructions: additionalInstructions || '',
+    additionalInfo: additionalInfo || '',
     questionConfig: parsedConfig,
     status: 'pending',
   })
@@ -235,11 +237,52 @@ async function handleClearAssignmentsCache() {
   }
 }
 
+/**
+ * Duplicate an existing assignment
+ * @param {String} id - Source assignment ID
+ * @param {Object} io - Socket.io instance
+ */
+async function handleDuplicateAssignment(id, io) {
+  const source = await Assignment.findById(id)
+  if (!source) {
+    const err = new Error('Assignment not found')
+    err.statusCode = 404
+    throw err
+  }
+
+  // Clone with new name and fresh due date (7 days from now)
+  const dueDate = new Date()
+  dueDate.setDate(dueDate.getDate() + 7)
+
+  const clone = await Assignment.create({
+    name: `${source.name} (Copy)`,
+    schoolName: source.schoolName || '',
+    subject: source.subject,
+    className: source.className,
+    dueDate,
+    additionalInstructions: source.additionalInstructions || '',
+    additionalInfo: source.additionalInfo || '',
+    questionConfig: source.questionConfig,
+    status: 'pending',
+  })
+
+  await addAIJob(clone._id.toString(), io)
+
+  if (io) {
+    io.emit('generation:queued', { assignmentId: clone._id.toString() })
+  }
+
+  void handleClearAssignmentsCache()
+
+  return clone
+}
+
 module.exports = {
   handleGetAllAssignments,
   handleCreateAssignment,
   handleGetAssignmentById,
   handleDeleteAssignment,
   handleRegenerateAssignment,
+  handleDuplicateAssignment,
   handleClearAssignmentsCache,
 }

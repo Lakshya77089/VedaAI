@@ -34,6 +34,7 @@ export default function CreateAssignmentForm() {
   const [className, setClassName] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [additionalInstructions, setAdditionalInstructions] = useState('')
+  const [additionalInfo, setAdditionalInfo] = useState('')
   const [questionConfig, setQuestionConfig] = useState<QuestionConfig>(DEFAULT_CONFIG)
   const [errors, setErrors] = useState<FormErrors>({})
   const [submitting, setSubmitting] = useState(false)
@@ -71,6 +72,7 @@ export default function CreateAssignmentForm() {
         className: className.trim(),
         dueDate: new Date(dueDate).toISOString(),
         additionalInstructions: additionalInstructions.trim(),
+        additionalInfo: additionalInfo.trim(),
         questionConfig,
       })
 
@@ -93,7 +95,7 @@ export default function CreateAssignmentForm() {
     fontSize: 14,
     outline: 'none',
     color: 'var(--foreground)',
-    backgroundColor: 'white',
+    backgroundColor: 'var(--color-input-bg)',
     fontFamily: 'inherit',
   }
 
@@ -118,7 +120,7 @@ export default function CreateAssignmentForm() {
       <form onSubmit={handleSubmit}>
         <div
           style={{
-            backgroundColor: 'white',
+            backgroundColor: 'var(--color-card-bg)',
             border: '1px solid var(--color-border)',
             borderRadius: 16,
             overflow: 'hidden',
@@ -264,40 +266,91 @@ export default function CreateAssignmentForm() {
               )}
             </div>
 
-            {/* Additional Instructions */}
-            <div>
-              <label style={labelStyle}>Additional Information (For better output)</label>
-              <div style={{ position: 'relative' }}>
-                <textarea
-                  placeholder="e.g Generate a question paper for 3 hour exam duration..."
-                  value={additionalInstructions}
-                  onChange={(e) => setAdditionalInstructions(e.target.value)}
-                  rows={4}
-                  style={{
-                    ...inputStyle,
-                    resize: 'vertical',
-                    paddingRight: 44,
-                  }}
-                />
-                <button
-                  type="button"
-                  style={{
-                    position: 'absolute',
-                    right: 12,
-                    bottom: 12,
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: '#9ca3af',
-                    display: 'flex',
-                    padding: 0,
-                  }}
-                >
-                  <Mic size={18} />
-                </button>
-              </div>
-            </div>
+          </div>
+        </div>
 
+        {/* Additional Information — context for the LLM */}
+        <div
+          style={{
+            backgroundColor: 'var(--color-card-bg)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 16,
+            overflow: 'hidden',
+            marginTop: 20,
+          }}
+        >
+          <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--color-border)' }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--foreground)', marginBottom: 2 }}>
+              Additional Information
+            </h2>
+            <p style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>
+              Provide context about the paper, syllabus, chapters, or topics — this helps the AI generate more relevant questions
+            </p>
+          </div>
+
+          <div style={{ padding: '24px' }}>
+            <textarea
+              placeholder="e.g. Focus on Chapter 5 — Quadratic Equations. Include questions on the quadratic formula, completing the square, and word problems. Difficulty should be moderate to hard."
+              value={additionalInfo}
+              onChange={(e) => setAdditionalInfo(e.target.value)}
+              rows={4}
+              style={{
+                ...inputStyle,
+                resize: 'vertical',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* General Instructions — separate card */}
+        <div
+          style={{
+            backgroundColor: 'var(--color-card-bg)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 16,
+            overflow: 'hidden',
+            marginTop: 20,
+          }}
+        >
+          <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--color-border)' }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--foreground)', marginBottom: 2 }}>
+              General Instructions
+            </h2>
+            <p style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>
+              This will appear as the &quot;General Instructions&quot; printed at the top of the generated paper
+            </p>
+          </div>
+
+          <div style={{ padding: '24px' }}>
+            <div style={{ position: 'relative' }}>
+              <textarea
+                placeholder="e.g. This paper is for 3 hours. All questions are compulsory. Use of calculator is not allowed..."
+                value={additionalInstructions}
+                onChange={(e) => setAdditionalInstructions(e.target.value)}
+                rows={4}
+                style={{
+                  ...inputStyle,
+                  resize: 'vertical',
+                  paddingRight: 44,
+                }}
+              />
+              <button
+                type="button"
+                style={{
+                  position: 'absolute',
+                  right: 12,
+                  bottom: 12,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#9ca3af',
+                  display: 'flex',
+                  padding: 0,
+                }}
+              >
+                <Mic size={18} />
+              </button>
+            </div>
           </div>
         </div>
 

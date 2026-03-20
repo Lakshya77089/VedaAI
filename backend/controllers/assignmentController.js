@@ -4,6 +4,7 @@ const {
   handleGetAssignmentById,
   handleDeleteAssignment,
   handleRegenerateAssignment,
+  handleDuplicateAssignment,
 } = require('../services/assignmentService')
 
 
@@ -58,10 +59,22 @@ async function regenerateAssignment(req, res, next) {
   }
 }
 
+
+async function duplicateAssignment(req, res, next) {
+  try {
+    const io = req.app.locals.io
+    const assignment = await handleDuplicateAssignment(req.params.id, io)
+    res.status(201).json({ success: true, data: assignment })
+  } catch (err) {
+    next(err)
+  }
+}
+
 module.exports = {
   getAllAssignments,
   createAssignment,
   getAssignmentById,
   deleteAssignment,
   regenerateAssignment,
+  duplicateAssignment,
 }

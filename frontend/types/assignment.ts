@@ -23,6 +23,7 @@ export interface IGeneratedContent {
   totalMarks: number
   totalQuestions: number
   timeAllowed: number
+  generalInstructions?: string
 }
 
 export interface QuestionConfigItem {
@@ -47,6 +48,7 @@ export interface AssignmentListItem {
 export interface AssignmentDetail extends AssignmentListItem {
   schoolName?: string
   additionalInstructions: string
+  additionalInfo: string
   questionConfig: QuestionConfig
   generatedContent?: IGeneratedContent
   errorMessage?: string

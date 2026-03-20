@@ -1,9 +1,10 @@
 'use client'
 
-import { Bell, ChevronDown, LayoutGrid } from 'lucide-react'
+import { Bell, ChevronDown, LayoutGrid, Moon, Sun } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAssignmentStore } from '@/store/useAssignmentStore'
 import { useNotificationStore } from '@/store/useNotificationStore'
+import { useThemeStore } from '@/store/useThemeStore'
 import { useEffect, useState } from 'react'
 import NotificationDropdown from './NotificationDropdown'
 
@@ -11,11 +12,15 @@ export default function Header() {
   const [mounted, setMounted] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const { unreadCount, fetchNotifications } = useNotificationStore()
+  const { theme, toggleTheme, setTheme } = useThemeStore()
 
   useEffect(() => {
     setMounted(true)
     fetchNotifications()
-  }, [fetchNotifications])
+    // Restore theme from localStorage on mount
+    const saved = localStorage.getItem('vedaai-theme') as 'light' | 'dark' | null
+    if (saved) setTheme(saved)
+  }, [fetchNotifications, setTheme])
 
   const pathname = usePathname()
   const router = useRouter()
@@ -55,8 +60,9 @@ export default function Header() {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 24px',
-        backgroundColor: 'white',
+        backgroundColor: 'var(--color-card-bg)',
         borderBottom: '1px solid var(--color-border)',
+        transition: 'background-color 0.3s ease',
       }}
     >
       {/* Left — back + page label */}
@@ -81,15 +87,34 @@ export default function Header() {
             </svg>
           </button>
         )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <LayoutGrid size={16} style={{ color: '#9ca3af' }} />
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Dark mode toggle */}
+          <button
+            onClick={toggleTheme}
+            title={mounted && theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 6,
+              borderRadius: 8,
+              display: 'flex',
+              color: 'var(--color-text-secondary)',
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-hover-bg)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+          >
+            {mounted && theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <LayoutGrid size={16} style={{ color: 'var(--color-text-secondary)' }} />
+          <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--foreground)' }}>
             {mounted ? pageLabel : 'Assignments'}
           </span>
         </div>
       </div>
 
-      {/* Right — bell + user */}
+      {/* Right — dark mode + bell + user */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <div style={{ position: 'relative' }}>
           <button
@@ -103,11 +128,11 @@ export default function Header() {
               padding: 6,
               borderRadius: 8,
               display: 'flex',
-              backgroundColor: notifOpen ? '#f3f4f6' : 'transparent',
+              backgroundColor: notifOpen ? 'var(--color-hover-bg)' : 'transparent',
               transition: 'background 0.2s',
             }}
           >
-            <Bell size={18} style={{ color: notifOpen ? '#111827' : '#6b7280' }} />
+            <Bell size={18} style={{ color: notifOpen ? 'var(--foreground)' : 'var(--color-text-secondary)' }} />
             {mounted && unreadCount > 0 && (
               <span
                 style={{
@@ -143,20 +168,20 @@ export default function Header() {
               width: 32,
               height: 32,
               borderRadius: '50%',
-              backgroundColor: '#e5e7eb',
+              backgroundColor: 'var(--color-border)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 12,
               fontWeight: 700,
-              color: '#374151',
+              color: 'var(--color-text-secondary)',
               flexShrink: 0,
             }}
           >
             JD
           </div>
-          <span style={{ fontSize: 13, fontWeight: 500, color: '#374151' }}>John Doe</span>
-          <ChevronDown size={14} style={{ color: '#9ca3af' }} />
+          <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--foreground)' }}>John Doe</span>
+          <ChevronDown size={14} style={{ color: 'var(--color-text-secondary)' }} />
         </div>
       </div>
     </header>

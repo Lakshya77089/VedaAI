@@ -9,9 +9,10 @@ import ThreeDotMenu from '@/components/ui/ThreeDotMenu'
 interface AssignmentCardProps {
   assignment: AssignmentListItem
   onDelete: (id: string) => void
+  onDuplicate?: (id: string) => void
 }
 
-export default function AssignmentCard({ assignment, onDelete }: AssignmentCardProps) {
+export default function AssignmentCard({ assignment, onDelete, onDuplicate }: AssignmentCardProps) {
   const router = useRouter()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
@@ -27,12 +28,12 @@ export default function AssignmentCard({ assignment, onDelete }: AssignmentCardP
     <div
       onClick={!confirmingDelete ? handleView : undefined}
       style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--color-card-bg)',
         border: `1px solid ${confirmingDelete ? '#fca5a5' : 'var(--color-border)'}`,
         borderRadius: 16,
         padding: '18px 20px',
         cursor: confirmingDelete ? 'default' : 'pointer',
-        transition: 'box-shadow 0.15s ease, border-color 0.15s ease',
+        transition: 'box-shadow 0.15s ease, border-color 0.15s ease, background-color 0.3s ease',
         display: 'flex',
         flexDirection: 'column',
         gap: 14,
@@ -42,11 +43,15 @@ export default function AssignmentCard({ assignment, onDelete }: AssignmentCardP
     >
       {/* Top row: title + menu */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', lineHeight: 1.4, flex: 1 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--foreground)', lineHeight: 1.4, flex: 1 }}>
           {assignment.name}
         </h3>
         <div onClick={(e) => e.stopPropagation()} style={{ flexShrink: 0 }}>
-          <ThreeDotMenu onView={handleView} onDelete={handleDeleteClick} />
+          <ThreeDotMenu
+            onView={handleView}
+            onDelete={handleDeleteClick}
+            onDuplicate={onDuplicate ? () => onDuplicate(assignment._id) : undefined}
+          />
         </div>
       </div>
 
@@ -76,11 +81,11 @@ export default function AssignmentCard({ assignment, onDelete }: AssignmentCardP
         /* Bottom row: dates */
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
           <p style={{ fontSize: 12, color: '#6b7280' }}>
-            <span style={{ fontWeight: 600, color: '#374151' }}>Assigned on : </span>
+            <span style={{ fontWeight: 600, color: 'var(--foreground)' }}>Assigned on : </span>
             {assignedDate}
           </p>
           <p style={{ fontSize: 12, color: '#6b7280' }}>
-            <span style={{ fontWeight: 600, color: '#374151' }}>Due : </span>
+            <span style={{ fontWeight: 600, color: 'var(--foreground)' }}>Due : </span>
             {dueDate}
           </p>
         </div>

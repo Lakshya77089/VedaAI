@@ -18,7 +18,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
           padding: '9px 14px',
           border: '1px solid var(--color-border)',
           borderRadius: 12,
-          backgroundColor: 'white',
+          backgroundColor: 'var(--color-card-bg)',
           flex: 1,
         }}
       >

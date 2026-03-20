@@ -1,6 +1,6 @@
 'use client'
 
-import { FileText, RefreshCw, ArrowLeft } from 'lucide-react'
+import { FileText, RefreshCw, ArrowLeft, Copy, FileDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
 
@@ -11,9 +11,23 @@ interface ActionBarProps {
   isRegenerating: boolean
   onPrintQuestions: () => void
   isPrinting: boolean
+  onDuplicate?: () => void
+  isDuplicating?: boolean
+  onDownloadWord?: () => void
+  isDownloadingWord?: boolean
 }
 
-export default function ActionBar({ assignmentId, onRegenerate, isRegenerating, onPrintQuestions, isPrinting }: ActionBarProps) {
+export default function ActionBar({
+  assignmentId,
+  onRegenerate,
+  isRegenerating,
+  onPrintQuestions,
+  isPrinting,
+  onDuplicate,
+  isDuplicating,
+  onDownloadWord,
+  isDownloadingWord,
+}: ActionBarProps) {
   const router = useRouter()
 
   return (
@@ -22,7 +36,7 @@ export default function ActionBar({ assignmentId, onRegenerate, isRegenerating, 
       style={{
         position: 'sticky',
         bottom: 0,
-        backgroundColor: 'white',
+        backgroundColor: 'var(--color-card-bg)',
         borderTop: '1px solid var(--color-border)',
         padding: '14px 32px',
         display: 'flex',
@@ -30,6 +44,7 @@ export default function ActionBar({ assignmentId, onRegenerate, isRegenerating, 
         alignItems: 'center',
         zIndex: 10,
         boxShadow: '0 -4px 12px rgba(0,0,0,0.05)',
+        transition: 'background-color 0.3s ease',
       }}
     >
       <Button
@@ -40,7 +55,27 @@ export default function ActionBar({ assignmentId, onRegenerate, isRegenerating, 
         Back
       </Button>
 
-      <div style={{ display: 'flex', gap: 10 }}>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        {onDuplicate && (
+          <Button
+            variant="secondary"
+            loading={isDuplicating}
+            icon={<Copy size={14} />}
+            onClick={onDuplicate}
+          >
+            Duplicate
+          </Button>
+        )}
+        {onDownloadWord && (
+          <Button
+            variant="secondary"
+            loading={isDownloadingWord}
+            icon={<FileDown size={14} />}
+            onClick={onDownloadWord}
+          >
+            Word
+          </Button>
+        )}
         <Button
           variant="secondary"
           loading={isRegenerating}

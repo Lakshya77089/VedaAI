@@ -34,7 +34,7 @@ export default function Sidebar() {
   return (
     <aside
       className="fixed left-0 top-0 h-full w-60 flex flex-col z-30"
-      style={{ backgroundColor: 'white', borderRight: '1px solid var(--color-border)' }}
+      style={{ backgroundColor: 'var(--color-card-bg)', borderRight: '1px solid var(--color-border)', transition: 'background-color 0.3s ease' }}
     >
       {/* Logo */}
       <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--color-border)' }}>
@@ -52,7 +52,7 @@ export default function Sidebar() {
           >
             <span style={{ color: 'white', fontWeight: 800, fontSize: 16 }}>V</span>
           </div>
-          <span style={{ fontWeight: 700, fontSize: 18, color: '#111827' }}>VedaAI</span>
+          <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--foreground)' }}>VedaAI</span>
         </div>
       </div>
 
@@ -98,13 +98,13 @@ export default function Sidebar() {
                 marginBottom: 2,
                 fontSize: 14,
                 fontWeight: isActive ? 600 : 400,
-                color: isActive ? '#111827' : '#6b7280',
-                backgroundColor: isActive ? '#f3f4f6' : 'transparent',
+                color: isActive ? 'var(--foreground)' : 'var(--color-text-secondary)',
+                backgroundColor: isActive ? 'var(--color-hover-bg)' : 'transparent',
                 textDecoration: 'none',
                 transition: 'background 0.15s, color 0.15s',
               }}
             >
-              <Icon size={17} style={{ color: isActive ? '#111827' : '#9ca3af' }} />
+              <Icon size={17} style={{ color: isActive ? 'var(--foreground)' : 'var(--color-text-secondary)' }} />
               <span>{label}</span>
               {mounted && label === 'Assignments' && assignments.length > 0 && (
                 <span
@@ -138,12 +138,12 @@ export default function Sidebar() {
             padding: '9px 12px',
             borderRadius: 10,
             fontSize: 14,
-            color: '#6b7280',
+            color: 'var(--color-text-secondary)',
             textDecoration: 'none',
             marginBottom: 4,
           }}
         >
-          <Settings size={17} style={{ color: '#9ca3af' }} />
+          <Settings size={17} style={{ color: 'var(--color-text-secondary)' }} />
           <span>Settings</span>
         </Link>
 
@@ -164,7 +164,7 @@ export default function Sidebar() {
             <span style={{ color: 'white', fontWeight: 700, fontSize: 13 }}>DPS</span>
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               Delhi Public School
             </p>
             <p style={{ fontSize: 11, color: '#9ca3af', display: 'flex', alignItems: 'center', gap: 3 }}>
