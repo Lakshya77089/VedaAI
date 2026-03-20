@@ -5,7 +5,7 @@ const cors = require('cors')
 const path = require('path')
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8080',
+  origin: true,
   credentials: true,
 }))
 app.use(cookieParser())
